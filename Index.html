@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Advanced Compound Interest Calculator with Graph and Inflation Adjustment</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h2 {
+            color: #333;
+        }
+        label {
+            margin-top: -10px;
+            display: block;
+            color: #666;
+        }
+        input, select, button {
+            width: 30%;
+            padding: 8px;
+            margin-top: 5px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box; /* Ensures padding does not affect width */
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #result {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        canvas {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Your existing HTML content remains unchanged -->
+</body>
+</html>
+</head>
+<body>
+    <h2>Advanced Compound Interest Calculator with Graph and Inflation Adjustment</h2>
+    
+    <label for="currency">Currency Symbol:</label>
+    <select id="currency">
+        <option value="$">$ (USD)</option>
+        <option value="£">£ (GBP)</option>
+        <option value="€">€ (EUR)</option>
+    </select><br><br>
+    
+    <label for="initialAmount">Initial Investment Amount:</label>
+    <input type="number" id="initialAmount" value="1000"><br><br>
+    
+    <label for="monthlyContribution">Monthly Contribution:</label>
+    <input type="number" id="monthlyContribution" value="100"><br><br>
+    
+    <label for="contributionIncrease">Annual Contribution Increase (%): (How much you will increase your contributions by per year)</label>
+    <input type="number" id="contributionIncrease" value="0"><br><br>
+    
+    <label for="targetInterest">Target Average Interest (%):</label>
+    <input type="number" id="targetInterest" value="2"><br><br>
+    
+    <label for="feeType">Account Fee Type:</label>
+    <select id="feeType">
+        <option value="percentage">Percentage</option>
+        <option value="flat">Flat Rate</option>
+    </select><br><br>
+    
+    <label for="accountFee">Annual Account Fee:</label>
+    <input type="number" id="accountFee" value="0"><br><br>
+    
+    <label for="ongoingCharge">Annual Ongoing Charge (%):</label>
+    <input type="number" id="ongoingCharge" value="0"><br><br>
+    
+    <label for="years">Number of Years:</label>
+    <input type="number" id="years" value="1" min="1" onchange="updateInterestInputs()"><br><br>
+    
+    <div id="interestRates">
+        <!-- Interest rate inputs will be added here -->
+    </div>
+    
+    <button onclick="calculate()">Calculate Future Value</button>
+    
+    <h3 id="result"></h3>
+    
+    <canvas id="investmentChart" width="400" height="200"></canvas>
+    
+    <script>
+        function updateInterestInputs() {
+            const years = document.getElementById('years').value;
+            const interestRatesDiv = document.getElementById('interestRates');
+            const targetInterest = document.getElementById('targetInterest').value;
+            interestRatesDiv.innerHTML = ''; // Clear previous inputs
+            
+            for (let i = 1; i <= years; i++) {
+                const inputHtml = `
+                    <label for="rateYear${i}">Year ${i} Interest Rate (%):</label>
+                    <input type="number" id="rateYear${i}" value="${targetInterest}" step="0.01"><br><br>
+                `;
+                interestRatesDiv.innerHTML += inputHtml;
+            }
+        }
+        
+        function calculate() {
+            const currencySymbol = document.getElementById('currency').value;
+            let initialAmount = parseFloat(document.getElementById('initialAmount').value);
+            let monthlyContribution = parseFloat(document.getElementById('monthlyContribution').value);
+            const contributionIncrease = parseFloat(document.getElementById('contributionIncrease').value) / 100;
+            const years = parseInt(document.getElementById('years').value);
+            const accountFee = parseFloat(document.getElementById('accountFee').value);
+            const feeType = document.getElementById('feeType').value;
+            const ongoingCharge = parseFloat(document.getElementById('ongoingCharge').value) / 100;
+            const inflationRate = 2.83 / 100; // Average inflation rate
+            let futureValueWithoutFees = initialAmount;
+            let totalFeesPaid = 0;
+            let futureValue = initialAmount;
+            let contributionsOnly = initialAmount;
+            let grossValues = [], netValues = [], contributions = [], adjustedForInflation = [];
+
+            for (let i = 1; i <= years; i++) {
+                const rate = parseFloat(document.getElementById(`rateYear${i}`).value) / 100;
+                for (let month = 1; month <= 12; month++) {
+                    futureValueWithoutFees = futureValueWithoutFees * (1 + rate / 12) + monthlyContribution;
+                    futureValue = futureValue * (1 + rate / 12) + monthlyContribution;
+                    contributionsOnly += monthlyContribution;
+                }
+                let yearlyFee = 0;
+                // Apply ongoing charge
+                futureValue -= futureValue * ongoingCharge;
+                yearlyFee += futureValueWithoutFees * ongoingCharge;
+                
+                // Apply account fee
+                if (feeType === "percentage") {
+                    futureValue -= futureValue * accountFee / 100;
+                    yearlyFee += futureValueWithoutFees * accountFee / 100;
+                } else { // flat fee
+                    futureValue -= accountFee;
+                    yearlyFee += accountFee;
+                }
+                
+                totalFeesPaid += yearlyFee;
+                monthlyContribution *= (1 + contributionIncrease); // Increase for the next year
+
+                grossValues.push(futureValueWithoutFees);
+                netValues.push(futureValue);
+                contributions.push(contributionsOnly);
+                adjustedForInflation.push(futureValue / Math.pow(1 + inflationRate, i));
+            }
+            
+            const netAmount = futureValue;
+            document.getElementById('result').innerHTML = `
+                Total Amount without Fees: ${currencySymbol}${numberWithCommas(futureValueWithoutFees.toFixed(2))}<br>
+                Total Fees Paid: ${currencySymbol}${numberWithCommas(totalFeesPaid.toFixed(2))}<br>
+                Net Amount after Fees: ${currencySymbol}${numberWithCommas(netAmount.toFixed(2))}<br>
+                Net Amount after Fees Adjusted for Inflation: ${currencySymbol}${numberWithCommas(adjustedForInflation[adjustedForInflation.length - 1].toFixed(2))}
+            `;
+
+            updateChart(grossValues, netValues, contributions, adjustedForInflation);
+        }
+
+        function numberWithCommas(x) {
+            return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        function updateChart(grossValues, netValues, contributions, adjustedForInflation) {
+            const ctx = document.getElementById('investmentChart').getContext('2d');
+            if (window.myInvestmentChart) {
+                window.myInvestmentChart.destroy(); // Destroy the old chart to avoid duplicates
+            }
+            window.myInvestmentChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: Array.from({length: grossValues.length}, (_, i) => `Year ${i + 1}`),
+                    datasets: [{
+                        label: 'Gross Value',
+                        data: grossValues,
+                        borderColor: 'rgb(75, 192, 192)',
+                        tension: 0.1
+                    }, {
+                        label: 'Net Value',
+                        data: netValues,
+                        borderColor: 'rgb(255, 99, 132)',
+                        tension: 0.1
+                    }, {
+                        label: 'Contributions',
+                        data: contributions,
+                        borderColor: 'rgb(54, 162, 235)',
+                        tension: 0.1
+                    }, {
+                        label: 'Adjusted for Inflation',
+                        data: adjustedForInflation,
+                        borderColor: 'rgb(255, 206, 86)',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initialize with 1 year interest rate input
+        updateInterestInputs();
+    </script>
+</body>
+</html>
