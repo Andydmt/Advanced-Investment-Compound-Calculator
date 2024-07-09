@@ -23,6 +23,15 @@
             background-color: #fff;
             border: 1px solid #ddd;
             border-radius: 4px;
+            font-size: 1rem;
+        }
+        .result-text {
+            font-size: 1.25rem;
+        }
+        .chart-container {
+            position: relative;
+            height: 400px;
+            width: 100%;
         }
         canvas {
             background-color: #fff;
@@ -138,19 +147,19 @@
                     <button type="button" class="btn btn-primary btn-block" onclick="calculate()">Calculate Future Value</button>
                 </form>
 
-                <h3 id="result" class="text-center mt-4"></h3>
+                <h3 id="result" class="text-center mt-4 result-text"></h3>
 
-                <canvas id="investmentChart" width="400" height="200"></canvas>
+                <div class="chart-container">
+                    <canvas id="investmentChart"></canvas>
+                </div>
             </div>
         </div>
 
         <!-- Promo Section -->
         <div class="promo-section">
-            <h3>Check Out My Trading 212 Pie</h3>
-            <p>Join a community of over 3,000 investors by exploring my 'Magnificent 7' pie on Trading 212. This carefully curated investment pie is updated monthly on the 1st to provide a market capitalization-weighted, ETF-style investment in the top US Tech companies commonly known as the 'Magnificent 7'.
-
-
-            <p><a href="https://www.trading212.com/pies/ltzwdw5mPqo0qOLXAztxVAFqFq35Q&h=AT3gvf6oT9j_8gcdHcW7wH192bv6qc3AnRJJ9QWRgtIObcKyZAAGsJES_gRSRxrVvtKrvMthNSeCRsUbGdtsEXJkMyjQLfUMfmPmwkvp64Xd65cn4K4x_K4p97TRkOSrv4WT-w" target="_blank">Invest Now</a>
+            <h3>Explore My Trading 212 Pie</h3>
+            <p>Join a community of over 3,000 investors by exploring my 'Magnificent 7' pie on Trading 212. This carefully curated investment pie is updated monthly on the 1st to provide a market capitalization-weighted, ETF-style investment in the top US Tech companies commonly known as the 'Magnificent 7'.</p>
+            <a href="https://www.trading212.com/pies/ltzwdw5mPqo0qOLXAztxVAFqFq35Q&h=AT3gvf6oT9j_8gcdHcW7wH192bv6qc3AnRJJ9QWRgtIObcKyZAAGsJES_gRSRxrVvtKrvMthNSeCRsUbGdtsEXJkMyjQLfUMfmPmwkvp64Xd65cn4K4x_K4p97TRkOSrv4WT-w" target="_blank">Invest Now</a>
         </div>
     </div>
 
@@ -300,7 +309,9 @@
                         y: {
                             beginAtZero: true
                         }
-                    }
+                    },
+                    responsive: true,
+                    maintainAspectRatio: false
                 }
             });
         }
