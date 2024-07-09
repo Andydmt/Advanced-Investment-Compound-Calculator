@@ -1,41 +1,21 @@
 <!DOCTYPE html>
-<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Advanced Compound Interest Calculator with Graph and Inflation Adjustment</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
             background-color: #f4f4f4;
+        }
+        .container {
+            margin-top: 20px;
         }
         h2 {
             color: #333;
-        }
-        label {
-            margin-top: -10px;
-            display: block;
-            color: #666;
-        }
-        input, select, button {
-            width: 30%;
-            padding: 8px;
-            margin-top: 5px;
-            margin-bottom: 20px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box; /* Ensures padding does not affect width */
-        }
-        button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #0056b3;
         }
         #result {
             margin-top: 10px;
@@ -49,86 +29,190 @@
             border: 1px solid #ddd;
             margin-top: 20px;
         }
+        .promo-section {
+            margin-top: 40px;
+            text-align: center;
+        }
+        .promo-section h3 {
+            color: #333;
+        }
+        .promo-section p {
+            color: #666;
+        }
+        .promo-section a {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+        .promo-section a:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
-    <!-- Your existing HTML content remains unchanged -->
-</body>
-</html>
-</head>
-<body>
-    <h2>Advanced Compound Interest Calculator with Graph and Inflation Adjustment</h2>
-    
-    <label for="currency">Currency Symbol:</label>
-    <select id="currency">
-        <option value="$">$ (USD)</option>
-        <option value="£">£ (GBP)</option>
-        <option value="€">€ (EUR)</option>
-    </select><br><br>
-    
-    <label for="initialAmount">Initial Investment Amount:</label>
-    <input type="number" id="initialAmount" value="1000"><br><br>
-    
-    <label for="monthlyContribution">Monthly Contribution:</label>
-    <input type="number" id="monthlyContribution" value="100"><br><br>
-    
-    <label for="contributionIncrease">Annual Contribution Increase (%): (How much you will increase your contributions by per year)</label>
-    <input type="number" id="contributionIncrease" value="0"><br><br>
-    
-    <label for="targetInterest">Target Average Interest (%):</label>
-    <input type="number" id="targetInterest" value="2"><br><br>
-    
-    <label for="feeType">Account Fee Type:</label>
-    <select id="feeType">
-        <option value="percentage">Percentage</option>
-        <option value="flat">Flat Rate</option>
-    </select><br><br>
-    
-    <label for="accountFee">Annual Account Fee:</label>
-    <input type="number" id="accountFee" value="0"><br><br>
-    
-    <label for="ongoingCharge">Annual Ongoing Charge (%):</label>
-    <input type="number" id="ongoingCharge" value="0"><br><br>
-    
-    <label for="years">Number of Years:</label>
-    <input type="number" id="years" value="1" min="1" onchange="updateInterestInputs()"><br><br>
-    
-    <div id="interestRates">
-        <!-- Interest rate inputs will be added here -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Andy Smart Investing</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#helpModal" data-toggle="modal">Help</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="text-center">Advanced Compound Interest Calculator with Graph and Inflation Adjustment</h2>
+
+                <form id="calculatorForm">
+                    <div class="form-group">
+                        <label for="currency">Currency Symbol:</label>
+                        <select id="currency" class="form-control" aria-label="Currency Symbol">
+                            <option value="$">$ (USD)</option>
+                            <option value="£">£ (GBP)</option>
+                            <option value="€">€ (EUR)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="initialAmount">Initial Investment Amount:</label>
+                        <input type="number" id="initialAmount" class="form-control" value="1000" aria-label="Initial Investment Amount">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="monthlyContribution">Monthly Contribution:</label>
+                        <input type="number" id="monthlyContribution" class="form-control" value="100" aria-label="Monthly Contribution">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="contributionIncrease">Annual Contribution Increase (%):</label>
+                        <input type="number" id="contributionIncrease" class="form-control" value="0" aria-label="Annual Contribution Increase">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="targetInterest">Target Average Interest (%):</label>
+                        <input type="number" id="targetInterest" class="form-control" value="2" aria-label="Target Average Interest" onchange="updateInterestInputs()">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="feeType">Account Fee Type:</label>
+                        <select id="feeType" class="form-control" aria-label="Account Fee Type">
+                            <option value="percentage">Percentage</option>
+                            <option value="flat">Flat Rate</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="accountFee">Annual Account Fee:</label>
+                        <input type="number" id="accountFee" class="form-control" value="0" aria-label="Annual Account Fee">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ongoingCharge">Annual Ongoing Charge (%):</label>
+                        <input type="number" id="ongoingCharge" class="form-control" value="0" aria-label="Annual Ongoing Charge">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="inflationRate">Inflation Rate (%):</label>
+                        <input type="number" id="inflationRate" class="form-control" value="2.83" step="0.01" aria-label="Inflation Rate">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="years">Number of Years:</label>
+                        <input type="number" id="years" class="form-control" value="1" min="1" aria-label="Number of Years" onchange="updateInterestInputs()">
+                    </div>
+
+                    <div id="interestRates" class="form-group">
+                        <!-- Interest rate inputs will be added here -->
+                    </div>
+
+                    <button type="button" class="btn btn-primary btn-block" onclick="calculate()">Calculate Future Value</button>
+                </form>
+
+                <h3 id="result" class="text-center mt-4"></h3>
+
+                <canvas id="investmentChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+
+        <!-- Promo Section -->
+        <div class="promo-section">
+            <h3>Check Out My Trading 212 Pie</h3>
+            <p>Join a community of over 3,000 investors by exploring my 'Magnificent 7' pie on Trading 212. This carefully curated investment pie is updated monthly on the 1st to provide a market capitalization-weighted, ETF-style investment in the top US Tech companies commonly known as the 'Magnificent 7'.
+
+
+            <p><a href="https://www.trading212.com/pies/ltzwdw5mPqo0qOLXAztxVAFqFq35Q&h=AT3gvf6oT9j_8gcdHcW7wH192bv6qc3AnRJJ9QWRgtIObcKyZAAGsJES_gRSRxrVvtKrvMthNSeCRsUbGdtsEXJkMyjQLfUMfmPmwkvp64Xd65cn4K4x_K4p97TRkOSrv4WT-w" target="_blank">Invest Now</a>
+        </div>
     </div>
-    
-    <button onclick="calculate()">Calculate Future Value</button>
-    
-    <h3 id="result"></h3>
-    
-    <canvas id="investmentChart" width="400" height="200"></canvas>
-    
+
+    <!-- Help Modal -->
+    <div class="modal fade" id="helpModal" tabindex="-1" role="dialog" aria-labelledby="helpModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="helpModalLabel">Help</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Welcome to the Advanced Compound Interest Calculator. This tool helps you project the future value of your investments considering various factors such as monthly contributions, annual interest rates, fees, and inflation.</p>
+                    <p><strong>Instructions:</strong></p>
+                    <ul>
+                        <li>Select your currency symbol.</li>
+                        <li>Enter your initial investment amount.</li>
+                        <li>Specify your monthly contribution and annual contribution increase percentage.</li>
+                        <li>Provide the target average interest rate and account fees.</li>
+                        <li>Adjust the inflation rate if needed.</li>
+                        <li>Set the number of years for the investment period and provide yearly interest rates.</li>
+                        <li>Click "Calculate Future Value" to see the results.</li>
+                    </ul>
+                    <p>If you have any questions, please contact support.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         function updateInterestInputs() {
-            const years = document.getElementById('years').value;
+            const years = document.getElementById('years').value || 1;
             const interestRatesDiv = document.getElementById('interestRates');
-            const targetInterest = document.getElementById('targetInterest').value;
+            const targetInterest = document.getElementById('targetInterest').value || 0;
             interestRatesDiv.innerHTML = ''; // Clear previous inputs
             
             for (let i = 1; i <= years; i++) {
                 const inputHtml = `
-                    <label for="rateYear${i}">Year ${i} Interest Rate (%):</label>
-                    <input type="number" id="rateYear${i}" value="${targetInterest}" step="0.01"><br><br>
+                    <div class="form-group">
+                        <label for="rateYear${i}">Year ${i} Interest Rate (%):</label>
+                        <input type="number" id="rateYear${i}" class="form-control" value="${targetInterest}" step="0.01">
+                    </div>
                 `;
                 interestRatesDiv.innerHTML += inputHtml;
             }
         }
-        
+
         function calculate() {
             const currencySymbol = document.getElementById('currency').value;
-            let initialAmount = parseFloat(document.getElementById('initialAmount').value);
-            let monthlyContribution = parseFloat(document.getElementById('monthlyContribution').value);
-            const contributionIncrease = parseFloat(document.getElementById('contributionIncrease').value) / 100;
-            const years = parseInt(document.getElementById('years').value);
-            const accountFee = parseFloat(document.getElementById('accountFee').value);
+            let initialAmount = parseFloat(document.getElementById('initialAmount').value) || 0;
+            let monthlyContribution = parseFloat(document.getElementById('monthlyContribution').value) || 0;
+            const contributionIncrease = parseFloat(document.getElementById('contributionIncrease').value) / 100 || 0;
+            const years = parseInt(document.getElementById('years').value) || 1;
+            const accountFee = parseFloat(document.getElementById('accountFee').value) || 0;
             const feeType = document.getElementById('feeType').value;
-            const ongoingCharge = parseFloat(document.getElementById('ongoingCharge').value) / 100;
-            const inflationRate = 2.83 / 100; // Average inflation rate
+            const ongoingCharge = parseFloat(document.getElementById('ongoingCharge').value) / 100 || 0;
+            const inflationRate = parseFloat(document.getElementById('inflationRate').value) / 100 || 0;
             let futureValueWithoutFees = initialAmount;
             let totalFeesPaid = 0;
             let futureValue = initialAmount;
@@ -136,7 +220,7 @@
             let grossValues = [], netValues = [], contributions = [], adjustedForInflation = [];
 
             for (let i = 1; i <= years; i++) {
-                const rate = parseFloat(document.getElementById(`rateYear${i}`).value) / 100;
+                const rate = parseFloat(document.getElementById(`rateYear${i}`).value) / 100 || 0;
                 for (let month = 1; month <= 12; month++) {
                     futureValueWithoutFees = futureValueWithoutFees * (1 + rate / 12) + monthlyContribution;
                     futureValue = futureValue * (1 + rate / 12) + monthlyContribution;
@@ -224,5 +308,9 @@
         // Initialize with 1 year interest rate input
         updateInterestInputs();
     </script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
