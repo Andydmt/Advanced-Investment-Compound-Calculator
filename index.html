@@ -260,10 +260,10 @@
             
             const netAmount = futureValue;
             document.getElementById('result').innerHTML = `
-                Total Amount without Fees: ${currencySymbol}${numberWithCommas(futureValueWithoutFees.toFixed(2))}<br>
-                Total Fees Paid: ${currencySymbol}${numberWithCommas(totalFeesPaid.toFixed(2))}<br>
-                Net Amount after Fees: ${currencySymbol}${numberWithCommas(netAmount.toFixed(2))}<br>
-                Net Amount after Fees Adjusted for Inflation: ${currencySymbol}${numberWithCommas(adjustedForInflation[adjustedForInflation.length - 1].toFixed(2))}
+                <Strong>Total Amount without Fees:</Strong> ${currencySymbol}${numberWithCommas(futureValueWithoutFees.toFixed(2))}<br>
+                <Strong>Total Fees Paid:</Strong> ${currencySymbol}${numberWithCommas(totalFeesPaid.toFixed(2))}<br>
+                <Strong>Net Amount after Fees:</Strong> ${currencySymbol}${numberWithCommas(netAmount.toFixed(2))}<br>
+                <strong>Net Amount after Fees Adjusted for Inflation:</Strong> ${currencySymbol}${numberWithCommas(adjustedForInflation[adjustedForInflation.length - 1].toFixed(2))}
             `;
 
             updateChart(grossValues, netValues, contributions, adjustedForInflation);
