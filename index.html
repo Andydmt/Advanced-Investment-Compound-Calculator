@@ -28,15 +28,32 @@
         .result-text {
             font-size: 1.25rem;
         }
-        .chart-container {
+        .chart-container, .table-container {
             position: relative;
-            height: 400px;
+            margin-top: 20px;
             width: 100%;
+        }
+        .chart-container {
+            height: 400px;
+        }
+        .fullscreen-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 10;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .fullscreen-btn:hover {
+            background-color: #0056b3;
         }
         canvas {
             background-color: #fff;
             border: 1px solid #ddd;
-            margin-top: 20px;
         }
         .promo-section {
             margin-top: 40px;
@@ -149,8 +166,29 @@
 
                 <h3 id="result" class="text-center mt-4 result-text"></h3>
 
-                <div class="chart-container">
+                <button type="button" class="btn btn-secondary btn-block mt-3" onclick="toggleView()">Toggle Chart/Table View</button>
+
+                <div class="chart-container" id="chartContainer">
                     <canvas id="investmentChart"></canvas>
+                    <button class="fullscreen-btn" onclick="toggleFullScreen()">Full Screen</button>
+                </div>
+
+                <div class="table-container" id="tableContainer" style="display: none;">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Year</th>
+                                <th>Annual Contribution (Accumulated)</th>
+                                <th>Accrued Interest</th>
+                                <th>Total Amount without Fees</th>
+                                <th>Total Amount with Fees</th>
+                                <th>Net Amount after Fees Adjusted for Inflation</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsTableBody">
+                            <!-- Table rows will be added here -->
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -195,6 +233,8 @@
     </div>
 
     <script>
+        let resultsData = [];
+
         function updateInterestInputs() {
             const years = document.getElementById('years').value || 1;
             const interestRatesDiv = document.getElementById('interestRates');
@@ -226,11 +266,16 @@
             let totalFeesPaid = 0;
             let futureValue = initialAmount;
             let contributionsOnly = initialAmount;
-            let grossValues = [], netValues = [], contributions = [], adjustedForInflation = [];
+            let grossValues = [], netValues = [], contributions = [], adjustedForInflation = [], accruedInterest = [];
+
+            resultsData = [];
 
             for (let i = 1; i <= years; i++) {
                 const rate = parseFloat(document.getElementById(`rateYear${i}`).value) / 100 || 0;
+                let interestAccruedThisYear = 0;
                 for (let month = 1; month <= 12; month++) {
+                    const interestThisMonth = futureValueWithoutFees * rate / 12;
+                    interestAccruedThisYear += interestThisMonth;
                     futureValueWithoutFees = futureValueWithoutFees * (1 + rate / 12) + monthlyContribution;
                     futureValue = futureValue * (1 + rate / 12) + monthlyContribution;
                     contributionsOnly += monthlyContribution;
@@ -256,17 +301,29 @@
                 netValues.push(futureValue);
                 contributions.push(contributionsOnly);
                 adjustedForInflation.push(futureValue / Math.pow(1 + inflationRate, i));
+                accruedInterest.push(interestAccruedThisYear);
+
+                // Save results data for table
+                resultsData.push({
+                    year: i,
+                    annualContribution: `${currencySymbol}${numberWithCommas(contributionsOnly.toFixed(2))}`,
+                    accruedInterest: `${currencySymbol}${numberWithCommas(interestAccruedThisYear.toFixed(2))}`,
+                    totalWithoutFees: `${currencySymbol}${numberWithCommas(futureValueWithoutFees.toFixed(2))}`,
+                    totalWithFees: `${currencySymbol}${numberWithCommas(futureValue.toFixed(2))}`,
+                    adjustedForInflation: `${currencySymbol}${numberWithCommas(adjustedForInflation[i-1].toFixed(2))}`
+                });
             }
             
             const netAmount = futureValue;
             document.getElementById('result').innerHTML = `
-                <Strong>Total Amount without Fees:</Strong> ${currencySymbol}${numberWithCommas(futureValueWithoutFees.toFixed(2))}<br>
-                <Strong>Total Fees Paid:</Strong> ${currencySymbol}${numberWithCommas(totalFeesPaid.toFixed(2))}<br>
-                <Strong>Net Amount after Fees:</Strong> ${currencySymbol}${numberWithCommas(netAmount.toFixed(2))}<br>
-                <strong>Net Amount after Fees Adjusted for Inflation:</Strong> ${currencySymbol}${numberWithCommas(adjustedForInflation[adjustedForInflation.length - 1].toFixed(2))}
+                <strong>Total Amount without Fees:</strong> ${currencySymbol}${numberWithCommas(futureValueWithoutFees.toFixed(2))}<br>
+                <strong>Total Fees Paid:</strong> ${currencySymbol}${numberWithCommas(totalFeesPaid.toFixed(2))}<br>
+                <strong>Net Amount after Fees:</strong> ${currencySymbol}${numberWithCommas(netAmount.toFixed(2))}<br>
+                <strong>Net Amount after Fees Adjusted for Inflation:</strong> ${currencySymbol}${numberWithCommas(adjustedForInflation[adjustedForInflation.length - 1].toFixed(2))}
             `;
 
             updateChart(grossValues, netValues, contributions, adjustedForInflation);
+            updateTable(resultsData);
         }
 
         function numberWithCommas(x) {
@@ -314,6 +371,48 @@
                     maintainAspectRatio: false
                 }
             });
+        }
+
+        function updateTable(data) {
+            const tableBody = document.getElementById('resultsTableBody');
+            tableBody.innerHTML = ''; // Clear previous rows
+
+            data.forEach(row => {
+                const rowHtml = `
+                    <tr>
+                        <td>${row.year}</td>
+                        <td>${row.annualContribution}</td>
+                        <td>${row.accruedInterest}</td>
+                        <td>${row.totalWithoutFees}</td>
+                        <td>${row.totalWithFees}</td>
+                        <td>${row.adjustedForInflation}</td>
+                    </tr>
+                `;
+                tableBody.innerHTML += rowHtml;
+            });
+        }
+
+        function toggleView() {
+            const chartContainer = document.getElementById('chartContainer');
+            const tableContainer = document.getElementById('tableContainer');
+            if (chartContainer.style.display === 'none') {
+                chartContainer.style.display = 'block';
+                tableContainer.style.display = 'none';
+            } else {
+                chartContainer.style.display = 'none';
+                tableContainer.style.display = 'block';
+            }
+        }
+
+        function toggleFullScreen() {
+            const chartContainer = document.getElementById('chartContainer');
+            if (!document.fullscreenElement) {
+                chartContainer.requestFullscreen().catch(err => {
+                    alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+                });
+            } else {
+                document.exitFullscreen();
+            }
         }
 
         // Initialize with 1 year interest rate input
